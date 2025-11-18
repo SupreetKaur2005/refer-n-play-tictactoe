@@ -2,49 +2,59 @@ import React, { useState } from 'react';
 import RegisterPage from './pages/RegisterPage';
 import ProfilePage from './pages/ProfilePage';
 import PlayPage from './pages/PlayPage';
-import { applyReferral } from './services/api';
-import axios from 'axios';
+import LeaderboardPage from './pages/LeaderboardPage';
 import { awardWin as sendWinReward } from "./services/api";
 
-export default function App(){
+export default function App() {
   const [user, setUser] = useState(null);
 
-  // on registration, store user in state
+  // On registration
   function handleRegistered(u) {
     setUser(u);
   }
 
-  // when referral applied, backend returns new balances.
+  // On referral update
   function handleReferralUpdated(res) {
-    // update local user coins
-    setUser(prev => ({ ...prev, coins: res.yourNewBalance, referredBy: prev.referredBy || res.referrer }));
+    setUser(prev => ({
+      ...prev,
+      coins: res.yourNewBalance,
+      referredBy: prev?.referredBy || res.referrer
+    }));
   }
 
-async function awardWin() {
-  if (!user?._id) return;
+  // When user wins a game
+  async function awardWin() {
+    if (!user?._id) return;
 
-  try {
-    const res = await sendWinReward({ userId: user._id });
-    setUser(prev => prev ? ({ ...prev, coins: res.newBalance }) : prev);
-
-  } catch (err) {
-    console.log("Win reward failed:", err);
+    try {
+      const res = await sendWinReward({ userId: user._id });
+      setUser(prev => prev ? { ...prev, coins: res.newBalance } : prev);
+    } catch (err) {
+      console.log("Win reward failed:", err);
+    }
   }
-}
-
 
   return (
-    <div style={{padding:20}}>
-      <h1>Refer & Earn — TicTacToe Demo</h1>
-      <div style={{display:'flex', gap:40}}>
-        <div style={{flex:1}}>
+    <div className="app-wrapper">
+      <h1 className="title">Refer & Earn — TicTacToe Demo</h1>
+
+      <div className="layout">
+        {/* LEFT SIDE */}
+        <div className="left-card">
           <RegisterPage onRegistered={handleRegistered} />
           <ProfilePage user={user} onUpdated={handleReferralUpdated} />
+
+          <div className="leader-card">
+            <LeaderboardPage />
+          </div>
         </div>
-        <div style={{flex:1}}>
+
+        {/* RIGHT SIDE */}
+        <div className="right-card">
           <PlayPage user={user} onWinReward={awardWin} />
         </div>
       </div>
     </div>
   );
 }
+

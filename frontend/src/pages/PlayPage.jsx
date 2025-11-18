@@ -11,7 +11,8 @@ const lines = [
 
 function checkWinner(board){
   for (const [a,b,c] of lines){
-    if (board[a] && board[a] === board[b] && board[a] === board[c]) return board[a];
+    if (board[a] && board[a] === board[b] && board[a] === board[c]) 
+      return board[a];
   }
   if (board.every(Boolean)) return 'draw';
   return null;
@@ -22,20 +23,28 @@ export default function PlayPage({ user, onWinReward }) {
   const [playerMark] = useState('X'); // player is X
   const [aiMark] = useState('O');
   const [status, setStatus] = useState('Your move');
+  const [rewardGiven, setRewardGiven] = useState(false);  // 🔥 NEW FLAG
 
   useEffect(() => {
     const winner = checkWinner(board);
+
     if (winner) {
       if (winner === playerMark) {
         setStatus('You win!');
-        onWinReward && onWinReward();
+
+        // ⭐ Give reward ONLY once
+        if (!rewardGiven && onWinReward) {
+          onWinReward();
+          setRewardGiven(true); // prevent further rewards
+        }
+
       } else if (winner === aiMark) {
         setStatus('AI wins');
       } else if (winner === 'draw') {
         setStatus('Draw');
       }
     }
-  }, [board, playerMark, aiMark, onWinReward]);
+  }, [board, playerMark, aiMark, onWinReward, rewardGiven]);
 
   function playerPlay(idx){
     if (board[idx] || checkWinner(board)) return;
@@ -47,6 +56,7 @@ export default function PlayPage({ user, onWinReward }) {
     setTimeout(() => {
       const winner = checkWinner(newBoard);
       if (winner) return;
+
       const move = aiMove(newBoard, aiMark, playerMark);
       if (move >= 0) {
         const nb = newBoard.slice();
@@ -59,6 +69,7 @@ export default function PlayPage({ user, onWinReward }) {
   function reset(){
     setBoard(Array(9).fill(null));
     setStatus('Your move');
+    setRewardGiven(false); // 🔥 reset reward flag
   }
 
   return (
