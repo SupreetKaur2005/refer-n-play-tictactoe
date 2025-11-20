@@ -1,6 +1,11 @@
 # refer-n-play-tictactoe
 simple tictactoe website with refer earn feature
 
+
+test my code by visiting:
+
+https://refer-n-play-tictactoe-bqcq.vercel.app/
+
 MERN STACK
 
 Backend:
@@ -19,7 +24,3 @@ Flow:
 1. Register on the frontend (generate referral code)
 2. Use another account to apply referral code (Profile -> Apply referral)
 3. Play Tic-Tac-Toe vs client-side AI
-
-Notes:
-- Backend seeds Config.referralReward = 50 if not present.
-- For deployment: host backend (Heroku/Render/Vercel serverless) and frontend (Vercel/Netlify). Use MongoDB Atlas for DB.
